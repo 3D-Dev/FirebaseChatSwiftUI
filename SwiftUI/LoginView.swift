@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import Firebase
 
-struct ContentView: View {
+struct LoginView: View {
     @State var isLoginMode = false
     @State var email = ""
     @State var password = ""
 
+    init() {
+        
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -24,7 +29,7 @@ struct ContentView: View {
                             .tag(false)
                     }.pickerStyle(SegmentedPickerStyle())
                     
-                    if isLoginMode {
+                    if !isLoginMode {
                         Button {
                             
                         } label: {
@@ -34,17 +39,31 @@ struct ContentView: View {
                         }
                     }
                     
-                    TextField("Email", text: $email)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    SecureField("Password", text: $password)
+                    Group {
+                        HStack {
+                            Image(systemName: "envelope")
+                                                .foregroundColor(.gray).font(.headline)
+                            TextField("Email", text: $email)
+                                .keyboardType(.emailAddress)
+                                .autocapitalization(.none)
+                        }
+                        HStack {
+                            Image(systemName: "lock.fill")
+                                                .foregroundColor(.gray).font(.headline)
+                            SecureField("Password", text: $password)
+                        }
+                        
+                    }
+                    .padding(12)
+                    .background(.white)
+                    
                     
                     Button {
                         
                     } label: {
                         HStack {
                             Spacer()
-                            Text("Create Account")
+                            Text(isLoginMode ? "Login" : "Create Account")
                                 .font(.system(size: 21))
                                 .foregroundColor(.white)
                                 .padding(.vertical, 10)
@@ -52,17 +71,25 @@ struct ContentView: View {
                         }.background(.blue)
                             
                     }
-                }.padding()
-                
-                Text("Here is my creation account page")
-            }.navigationTitle(isLoginMode ? "Login" : "Create Account")
+                }
+                .padding()
+            }
+            .navigationTitle(isLoginMode ? "Login" : "Create Account")
+            .background(Color(.init(white: 0, alpha: 0.05 )))
+        }
+    }
     
+    private func handleAction() {
+        if isLoginMode {
+            
+        } else {
+            
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        LoginView()
     }
 }

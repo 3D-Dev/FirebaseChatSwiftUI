@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct SwiftUIApp: App {
+struct SwiftUIFirebaseChatApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoginView()
         }
     }
 }
