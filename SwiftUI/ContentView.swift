@@ -16,23 +16,23 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 
-                VStack{
+                VStack(spacing: 16) {
                     Picker(selection: $isLoginMode, label: Text("Picker here")) {
                         Text("Login")
                             .tag(true)
                         Text("Create Account")
                             .tag(false)
                     }.pickerStyle(SegmentedPickerStyle())
-                        .padding()
                     
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "person.crop.circle.fill.badge.plus")
-                            .font(.system(size: 64))
-                            .padding()
+                    if isLoginMode {
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "person.crop.circle.fill.badge.plus")
+                                .font(.system(size: 64))
+                                .padding()
+                        }
                     }
-                    
                     
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
@@ -54,13 +54,8 @@ struct ContentView: View {
                     }
                 }.padding()
                 
-                
-                
-                
-                
-                
                 Text("Here is my creation account page")
-            }.navigationTitle("Create Account")
+            }.navigationTitle(isLoginMode ? "Login" : "Create Account")
     
         }
     }
