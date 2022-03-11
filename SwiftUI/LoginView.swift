@@ -21,7 +21,8 @@ struct LoginView: View {
     @State var isLoginMode = false
     @State var email = ""
     @State var password = ""
-
+    @State var shouldShowImagePicker = false
+    @State var image: UIImage?
     
     var body: some View {
         NavigationView {
@@ -37,11 +38,23 @@ struct LoginView: View {
                     
                     if !isLoginMode {
                         Button {
-                            
+                            shouldShowImagePicker.toggle()
                         } label: {
-                            Image(systemName: "person.crop.circle.fill.badge.plus")
-                                .font(.system(size: 64))
-                                .padding()
+                            VStack {
+                                if let image = self.image {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 128, height: 128)
+                                        .cornerRadius(64)
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill.badge.plus")
+                                        .font(.system(size: 76))
+                                        .padding()
+                                        .foregroundColor(Color(.label))
+                                }
+                            }
+                            
                         }
                     }
                     
@@ -84,6 +97,11 @@ struct LoginView: View {
             }
             .navigationTitle(isLoginMode ? "Login" : "Create Account")
             .background(Color(.init(white: 0, alpha: 0.05 )))
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+        .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
+            ImagePicker(image: $image)
+                .ignoresSafeArea()
         }
     }
     
