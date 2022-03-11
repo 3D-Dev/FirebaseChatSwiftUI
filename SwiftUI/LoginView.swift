@@ -14,7 +14,7 @@ struct LoginView: View {
     @State var password = ""
 
     init() {
-        
+        FirebaseApp.configure()
     }
     
     var body: some View {
