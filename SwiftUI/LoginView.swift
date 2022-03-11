@@ -59,7 +59,7 @@ struct LoginView: View {
                     
                     
                     Button {
-                        
+                        handleAction()
                     } label: {
                         HStack {
                             Spacer()
@@ -71,6 +71,8 @@ struct LoginView: View {
                         }.background(.blue)
                             
                     }
+                    Text(self.loginStatusMessage)
+                        .foregroundColor(.red)
                 }
                 .padding()
             }
@@ -81,9 +83,36 @@ struct LoginView: View {
     
     private func handleAction() {
         if isLoginMode {
-            
+            loginAccount()
         } else {
-            
+            createNewAccount()
+        }
+    }
+    
+    @State var loginStatusMessage = ""
+    private func createNewAccount() {
+        Auth.auth().createUser(withEmail: email, password: password) {
+            result, err in
+            if let err = err {
+                print("Failed to create user:", err)
+                self.loginStatusMessage = "Failed to create user: \(err)"
+                return
+            }
+            print("Successfully create user: \(result?.user.uid ?? "")")
+            self.loginStatusMessage = "Successfully create user: \(result?.user.uid ?? "")"
+        }
+    }
+    
+    private func loginAccount() {
+        Auth.auth().signIn(withEmail: email, password: password) {
+            result, err in
+            if let err = err {
+                print("Failed to login user:", err)
+                self.loginStatusMessage = "Failed to login user: \(err)"
+                return
+            }
+            print("Successfully login user: \(result?.user.uid ?? "")")
+            self.loginStatusMessage = "Successfully login user: \(result?.user.uid ?? "")"
         }
     }
 }
