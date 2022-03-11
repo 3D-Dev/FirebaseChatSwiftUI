@@ -17,6 +17,7 @@
 		15A43C4527DB296600A46AFA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 15A43C4427DB296600A46AFA /* FirebaseAuth */; };
 		15A43C4727DB296600A46AFA /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 15A43C4627DB296600A46AFA /* FirebaseStorage */; };
 		15A43C4927DB2F8100A46AFA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 15A43C4827DB2F8100A46AFA /* GoogleService-Info.plist */; };
+		15A43C4B27DB387B00A46AFA /* ImagePiker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A43C4A27DB387B00A46AFA /* ImagePiker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		1515BBB427D9E55800A2A4BC /* SwiftUIUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIUITests.swift; sourceTree = "<group>"; };
 		1515BBB627D9E55800A2A4BC /* SwiftUIUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		15A43C4827DB2F8100A46AFA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		15A43C4A27DB387B00A46AFA /* ImagePiker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePiker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 			children = (
 				1515BB9927D9E55700A2A4BC /* SwiftUIFirebaseChatApp.swift */,
 				1515BB9B27D9E55700A2A4BC /* LoginView.swift */,
+				15A43C4A27DB387B00A46AFA /* ImagePiker.swift */,
 				1515BB9D27D9E55800A2A4BC /* Assets.xcassets */,
 				15A43C4827DB2F8100A46AFA /* GoogleService-Info.plist */,
 				1515BB9F27D9E55800A2A4BC /* Preview Content */,
@@ -273,6 +276,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1515BB9C27D9E55700A2A4BC /* LoginView.swift in Sources */,
+				15A43C4B27DB387B00A46AFA /* ImagePiker.swift in Sources */,
 				1515BB9A27D9E55700A2A4BC /* SwiftUIFirebaseChatApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
