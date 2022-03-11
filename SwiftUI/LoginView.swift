@@ -10,10 +10,12 @@ import Firebase
 
 class FirebaseManager: NSObject {
     let auth: Auth
+    let storage: Storage
     static let shared = FirebaseManager()
     override init() {
         FirebaseApp.configure()
         self.auth = Auth.auth()
+        self.storage = Storage.storage()
         super.init()
     }
 }
@@ -54,6 +56,9 @@ struct LoginView: View {
                                         .foregroundColor(Color(.label))
                                 }
                             }
+                            .overlay(RoundedRectangle(cornerRadius: 64)
+                                        .stroke(Color.black, lineWidth: 3)
+                                    )
                             
                         }
                     }
@@ -124,6 +129,7 @@ struct LoginView: View {
             }
             print("Successfully create user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully create user: \(result?.user.uid ?? "")"
+            self.persistImageToStorage()
         }
     }
     
@@ -137,6 +143,27 @@ struct LoginView: View {
             }
             print("Successfully login user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully login user: \(result?.user.uid ?? "")"
+        }
+    }
+    
+    private func persistImageToStorage() {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
+        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
+        ref.putData(imageData, metadata: nil) {
+            metadata, err in
+            if let err = err {
+                self.loginStatusMessage = "Failed to push image to Storage: \(err)"
+                return
+            }
+            
+            ref.downloadURL { url, err in
+                if let err = err {
+                    self.loginStatusMessage = "Failed to retrieve downloadURL: \(err)"
+                    return
+                }
+                self.loginStatusMessage = "Successfully storage image with url: \(url?.absoluteString ?? "")"
+            }
         }
     }
 }
