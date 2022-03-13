@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainMessageView: View {
+    @State var shouldShowLogOutOptions = false
     var body: some View {
         NavigationView {
             VStack {
@@ -28,13 +29,16 @@ struct MainMessageView: View {
                         }
                         Spacer()
                         Button {
-
+                            shouldShowLogOutOptions.toggle()
                         } label: {
                             Image(systemName: "gearshape.fill")
                                 .font(.system(size: 24))
+                                .foregroundColor(Color(.label))
                         }
                     }.padding()
-                    //Divider()
+                    .actionSheet(isPresented: $shouldShowLogOutOptions) {
+                        .init(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [.destructive(Text("Sign Out"), action: {print("handle sign out")}),.cancel()])
+                    }                    //Divider()
                 ScrollView {
                     ForEach(0..<10, id: \.self) {
                         num in
@@ -56,14 +60,17 @@ struct MainMessageView: View {
                             Divider()
                                 .padding(.vertical, 8)
                         }.padding(.horizontal)
-                    }
+                    }.padding(.bottom, 50)
                 }
+            }
+            .overlay(
                 Button {
                     
                 } label: {
                     HStack {
                         Spacer()
                         Text("+ New Message")
+                            .font(.system(size: 16, weight: .bold))
                         Spacer()
                     }
                     .foregroundColor(.white)
@@ -71,8 +78,9 @@ struct MainMessageView: View {
                     .background(Color.blue)
                     .cornerRadius(32)
                     .padding(.horizontal, 15)
-                }
-            }.navigationBarHidden(true)
+                    .shadow(radius: 15)
+                }, alignment: .bottom)
+        .navigationBarHidden(true)
         }
     }
 }
@@ -80,6 +88,7 @@ struct MainMessageView: View {
 struct MainMessageView_Previews: PreviewProvider {
     static var previews: some View {
             MainMessageView()
+            .preferredColorScheme(.dark)
 
     }
 }
