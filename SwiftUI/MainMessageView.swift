@@ -58,8 +58,21 @@ struct MainMessageView: View {
                         }.padding(.horizontal)
                     }
                 }
-            }
-            .navigationBarHidden(true)
+                Button {
+                    
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text("+ New Message")
+                        Spacer()
+                    }
+                    .foregroundColor(.white)
+                    .padding(.vertical)
+                    .background(Color.blue)
+                    .cornerRadius(32)
+                    .padding(.horizontal, 15)
+                }
+            }.navigationBarHidden(true)
         }
     }
 }
