@@ -11,32 +11,40 @@ struct MainMessageView: View {
     var body: some View {
         NavigationView {
             VStack {
-                VStack {
                     HStack(spacing: 16) {
                         Image(systemName: "person.fill")
                             .font(.system(size: 36))
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text("UserName")
                                 .font(.system(size: 24, weight: .bold))
-                            Text("online")
+                            HStack {
+                                Circle()
+                                    .foregroundColor(.green)
+                                    .frame(width: 14, height: 14)
+                                Text("online")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color(.lightGray))
+                            }
                         }
                         Spacer()
                         Button {
-                            
+
                         } label: {
                             Image(systemName: "gearshape.fill")
                                 .font(.system(size: 24))
                         }
-                    }
-                    Divider()
-                }.padding(.horizontal)
+                    }.padding()
+                    //Divider()
                 ScrollView {
                     ForEach(0..<10, id: \.self) {
                         num in
                         VStack {
                             HStack(spacing: 16) {
                                 Image(systemName: "person.fill")
-                                    .font(.system(size: 36))
+                                    .font(.system(size: 32))
+                                    .padding()
+                                    .overlay(RoundedRectangle(cornerRadius: 44)
+                                                .stroke(lineWidth: 1))
                                 VStack(alignment: .leading) {
                                     Text("UserName")
                                     Text("Message sent to user")
@@ -46,17 +54,19 @@ struct MainMessageView: View {
                                     .font(.system(size: 14, weight: .semibold))
                             }
                             Divider()
+                                .padding(.vertical, 8)
                         }.padding(.horizontal)
                     }
                 }
             }
+            .navigationBarHidden(true)
         }
-        .navigationBarHidden(true)
     }
 }
 
 struct MainMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MainMessageView()
+            MainMessageView()
+
     }
 }
