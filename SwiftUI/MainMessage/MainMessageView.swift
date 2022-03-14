@@ -6,10 +6,69 @@
 //
 
 import SwiftUI
+import FirebaseFirestoreSwift
+import SDWebImageSwiftUI
 
+struct ChatUser {
+    let uid, email, profileImageUrl: String
+}
+class MainMessagesViewModel: ObservableObject {
+    
+    @Published var errorMessage = ""
+    @Published var chatUser = [ChatUser]()
+    @Published var userData : ChatUser?
+    
+    init() {
+        fetchCurrentUser()
+    }
+    private func fetchCurrentUser() {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            self.errorMessage = "Could not find firebase uid"
+            return
+            
+        }
+        self.errorMessage = "\(uid)"
+        //let docRef = FirebaseManager.shared.firestore.collection(uid).document(documentId)
+        
+//        FirebaseManager.shared.firestore.collection(uid).getDocuments{snapshot, error in
+//            if let error = error {
+//            print("Failed to fetch current user", error)
+//            return
+//        }
+//            guard let data = snapshot?.data(as:"uid") else {
+//                self.errorMessage = "Could not find data"
+//                return
+//            }
+//            let uid = data["uid"] as? String ?? ""
+//            let email = data["email"] as? String ?? ""
+//            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+//            let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+//        }
+        
+        FirebaseManager.shared.firestore.collection("users").addSnapshotListener {(querySnapshot, error) in
+            guard let documents = querySnapshot?.documents else {
+                print("No documents")
+                return
+            }
+            self.chatUser = documents.map {
+                queryDocumentSnapshot -> ChatUser in
+                let data = queryDocumentSnapshot.data()
+                let uid = data["uid"] as? String ?? ""
+                let email = data["email"] as? String ?? ""
+                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+                let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+                self.userData = chatUser
+                self.errorMessage = chatUser.profileImageUrl
+                print(chatUser.profileImageUrl)
+                return chatUser
+            }
+        }
+        
+    }
+}
 struct MainMessageView: View {
     @State var shouldShowLogOutOptions = false
-    
+    @ObservedObject private var vm = MainMessagesViewModel()
     var body: some View {
         NavigationView {
             VStack {
@@ -24,8 +83,15 @@ struct MainMessageView: View {
     
     private var customNavBar: some View {
         HStack(spacing: 16) {
-            Image(systemName: "person.fill")
-                .font(.system(size: 36))
+            WebImage(url: URL(string: vm.userData?.profileImageUrl ?? ""))
+                .resizable()
+                .scaledToFill()
+                .frame(width: 49, height: 49)
+                .clipped()
+                .cornerRadius(49)
+                .overlay(RoundedRectangle(cornerRadius: 44)
+                            .stroke(lineWidth: 1))
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text("UserName")
                     .font(.system(size: 24, weight: .bold))
