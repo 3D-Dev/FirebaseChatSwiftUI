@@ -15,7 +15,8 @@ struct ChatUser {
 class MainMessagesViewModel: ObservableObject {
     
     @Published var errorMessage = ""
-    @Published var chatUser: ChatUser?
+    @Published var chatUser = [ChatUser]()
+    @Published var userData : ChatUser?
     
     init() {
         fetchCurrentUser()
@@ -27,21 +28,42 @@ class MainMessagesViewModel: ObservableObject {
             
         }
         self.errorMessage = "\(uid)"
-        FirebaseManager.shared.firestore.collection(uid).getDocuments{snapshot, error in
-            if let error = error {
-            print("Failed to fetch current user", error)
-            return
-        }
-            guard let data = snapshot?.data() else {
-                self.errorMessage = "Could not find data"
+        //let docRef = FirebaseManager.shared.firestore.collection(uid).document(documentId)
+        
+//        FirebaseManager.shared.firestore.collection(uid).getDocuments{snapshot, error in
+//            if let error = error {
+//            print("Failed to fetch current user", error)
+//            return
+//        }
+//            guard let data = snapshot?.data(as:"uid") else {
+//                self.errorMessage = "Could not find data"
+//                return
+//            }
+//            let uid = data["uid"] as? String ?? ""
+//            let email = data["email"] as? String ?? ""
+//            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+//            let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+//        }
+        
+        FirebaseManager.shared.firestore.collection("users").addSnapshotListener {(querySnapshot, error) in
+            guard let documents = querySnapshot?.documents else {
+                print("No documents")
                 return
-                
             }
-            let uid = data["uid"] as? String ?? ""
-            let email = data["email"] as? String ?? ""
-            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-            let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+            self.chatUser = documents.map {
+                queryDocumentSnapshot -> ChatUser in
+                let data = queryDocumentSnapshot.data()
+                let uid = data["uid"] as? String ?? ""
+                let email = data["email"] as? String ?? ""
+                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+                let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+                self.userData = chatUser
+                self.errorMessage = chatUser.profileImageUrl
+                print(chatUser.profileImageUrl)
+                return chatUser
+            }
         }
+        
     }
 }
 struct MainMessageView: View {
@@ -61,9 +83,7 @@ struct MainMessageView: View {
     
     private var customNavBar: some View {
         HStack(spacing: 16) {
-//            Image(systemName: "person.fill")
-//                .font(.system(size: 36))
-            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+            WebImage(url: URL(string: vm.userData?.profileImageUrl ?? ""))
                 .resizable()
                 .scaledToFill()
                 .frame(width: 49, height: 49)
