@@ -11,8 +11,10 @@ import SwiftUI
 struct SwiftUIFirebaseChatApp: App {
     var body: some Scene {
         WindowGroup {
-            MainMessageView()
-            //LoginView()
+            //MainMessageView()
+            LoginView(didCompleteLoginProcess: {
+                
+            })
         }
     }
 }
