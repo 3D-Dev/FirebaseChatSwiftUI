@@ -15,9 +15,11 @@ struct ChatUser {
 class MainMessagesViewModel: ObservableObject {
     
     @Published var errorMessage = ""
-    @Published var chatUser = [ChatUser]()
-    @Published var userData : ChatUser?
-    
+    //Second method for access to firestore
+    //@Published var chatUser = [ChatUser]()
+    //@Published var userData : ChatUser?
+    @Published var chatUser : ChatUser?
+    @Published var isUserCurrentlyLoggedIn = true
     init() {
         fetchCurrentUser()
     }
@@ -28,42 +30,50 @@ class MainMessagesViewModel: ObservableObject {
             
         }
         self.errorMessage = "\(uid)"
-        //let docRef = FirebaseManager.shared.firestore.collection(uid).document(documentId)
         
-//        FirebaseManager.shared.firestore.collection(uid).getDocuments{snapshot, error in
-//            if let error = error {
-//            print("Failed to fetch current user", error)
-//            return
-//        }
-//            guard let data = snapshot?.data(as:"uid") else {
-//                self.errorMessage = "Could not find data"
-//                return
-//            }
-//            let uid = data["uid"] as? String ?? ""
-//            let email = data["email"] as? String ?? ""
-//            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-//            let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
-//        }
-        
-        FirebaseManager.shared.firestore.collection("users").addSnapshotListener {(querySnapshot, error) in
-            guard let documents = querySnapshot?.documents else {
-                print("No documents")
-                return
-            }
-            self.chatUser = documents.map {
-                queryDocumentSnapshot -> ChatUser in
-                let data = queryDocumentSnapshot.data()
-                let uid = data["uid"] as? String ?? ""
-                let email = data["email"] as? String ?? ""
-                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-                let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
-                self.userData = chatUser
-                self.errorMessage = chatUser.profileImageUrl
-                print(chatUser.profileImageUrl)
-                return chatUser
-            }
+        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
+                    if let error = error {
+                        self.errorMessage = "Failed to fetch current user: \(error)"
+                        print("Failed to fetch current user:", error)
+                        return
+                    }
+
+                    guard let data = snapshot?.data() else {
+                        self.errorMessage = "No data found"
+                        return
+
+                    }
+            let uid = data["uid"] as? String ?? ""
+            let email = data["email"] as? String ?? ""
+            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+            self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
         }
         
+// Second method for access to firestore
+//        FirebaseManager.shared.firestore.collection("users").addSnapshotListener {(querySnapshot, error) in
+//            guard let documents = querySnapshot?.documents else {
+//                print("No documents")
+//                return
+//            }
+//            self.chatUser = documents.map {
+//                queryDocumentSnapshot -> ChatUser in
+//                let data = queryDocumentSnapshot.data()
+//                let uid = data["uid"] as? String ?? ""
+//                let email = data["email"] as? String ?? ""
+//                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+//                let chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+//                self.userData = chatUser
+//                self.errorMessage = chatUser.profileImageUrl
+//                print(chatUser.profileImageUrl)
+//                return chatUser
+//            }
+//        }
+    }
+    
+    func handleSignOut() {
+        isUserCurrentlyLoggedIn.toggle()
+        self.errorMessage = "LoginStatus'\(isUserCurrentlyLoggedIn)'"
+        print("LoginStatus'\(isUserCurrentlyLoggedIn)'")
     }
 }
 struct MainMessageView: View {
@@ -72,6 +82,8 @@ struct MainMessageView: View {
     var body: some View {
         NavigationView {
             VStack {
+                Text(vm.errorMessage)
+                    .foregroundColor(.red)
                     customNavBar
                     messageView
             }
@@ -83,7 +95,7 @@ struct MainMessageView: View {
     
     private var customNavBar: some View {
         HStack(spacing: 16) {
-            WebImage(url: URL(string: vm.userData?.profileImageUrl ?? ""))
+            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
                 .resizable()
                 .scaledToFill()
                 .frame(width: 49, height: 49)
@@ -114,7 +126,9 @@ struct MainMessageView: View {
             }
         }.padding()
         .actionSheet(isPresented: $shouldShowLogOutOptions) {
-            .init(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [.destructive(Text("Sign Out"), action: {print("handle sign out")}),.cancel()])
+            .init(title: Text("Settings"), message: Text("What do you want to do?"),
+                  buttons: [.destructive(Text("Sign Out"),
+                                         action: {print("handle sign out");vm.handleSignOut()}),.cancel()])
         }
     }
     
