@@ -19,7 +19,7 @@ class MainMessagesViewModel: ObservableObject {
     //@Published var chatUser = [ChatUser]()
     //@Published var userData : ChatUser?
     @Published var chatUser : ChatUser?
-    @Published var isUserCurrentlyLoggedIn = true
+    @Published var isUserCurrentlyLoggedOut = false
     init() {
         fetchCurrentUser()
     }
@@ -71,9 +71,10 @@ class MainMessagesViewModel: ObservableObject {
     }
     
     func handleSignOut() {
-        isUserCurrentlyLoggedIn.toggle()
-        self.errorMessage = "LoginStatus'\(isUserCurrentlyLoggedIn)'"
-        print("LoginStatus'\(isUserCurrentlyLoggedIn)'")
+        isUserCurrentlyLoggedOut.toggle()
+        self.errorMessage = "LoginStatus'\(isUserCurrentlyLoggedOut)'"
+        print("LoginStatus'\(isUserCurrentlyLoggedOut)'")
+        try?FirebaseManager.shared.auth.signOut()
     }
 }
 struct MainMessageView: View {
@@ -130,6 +131,10 @@ struct MainMessageView: View {
                   buttons: [.destructive(Text("Sign Out"),
                                          action: {print("handle sign out");vm.handleSignOut()}),.cancel()])
         }
+        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut) {
+            LoginView()
+        }
+
     }
     
     private var messageView : some View {

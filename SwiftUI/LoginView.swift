@@ -133,6 +133,7 @@ struct LoginView: View {
             }
             print("Successfully login user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully login user: \(result?.user.uid ?? "")"
+            //MainMessageView()
         }
     }
     
