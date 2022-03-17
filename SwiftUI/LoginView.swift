@@ -189,5 +189,10 @@ struct ContentView_Previews: PreviewProvider {
         LoginView(didCompleteLoginProcess: {
             
         })
+            .preferredColorScheme(.dark)
+        LoginView(didCompleteLoginProcess: {
+            
+        })
+
     }
 }

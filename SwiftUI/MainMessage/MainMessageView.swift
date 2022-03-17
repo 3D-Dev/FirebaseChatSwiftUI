@@ -193,6 +193,7 @@ struct MainMessageView_Previews: PreviewProvider {
     static var previews: some View {
             MainMessageView()
             .preferredColorScheme(.dark)
+            MainMessageView()
 
     }
 }
