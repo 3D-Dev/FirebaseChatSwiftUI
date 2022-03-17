@@ -165,6 +165,7 @@ struct MainMessageView: View {
         }.padding(.bottom, 50)
     }
     
+    @State var shouldShowNewMessageScreen = true
     private var newMessageButton : some View {
             Button {
                 
@@ -181,6 +182,9 @@ struct MainMessageView: View {
                 .cornerRadius(32)
                 .padding(.horizontal, 15)
                 .shadow(radius: 15)
+            }
+            .fullScreenCover(isPresented: $shouldShowNewMessageScreen, onDismiss: nil) {
+                CreateNewMessageView()
             }
         }
 }
