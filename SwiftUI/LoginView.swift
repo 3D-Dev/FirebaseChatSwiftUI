@@ -10,8 +10,8 @@ import Firebase
 
 struct LoginView: View {
     @State private var isLoginMode = false
-    @State private var email = ""
-    @State private var password = ""
+    @State private var email = "test3@gmail.com"
+    @State private var password = "111111"
     @State private var shouldShowImagePicker = false
     @State private var image: UIImage?
     @State var didCompleteLoginProcess: () -> ()

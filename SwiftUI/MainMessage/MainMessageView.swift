@@ -49,7 +49,7 @@ class MainMessagesViewModel: ObservableObject {
             let uid = data["uid"] as? String ?? ""
             let email = data["email"] as? String ?? ""
             let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-            self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+            self.chatUser = ChatUser(uid: uid, email: email.replacingOccurrences(of: "@gmail.com", with: ""), profileImageUrl: profileImageUrl)
         }
         
 // Second method for access to firestore
@@ -109,7 +109,7 @@ struct MainMessageView: View {
                             .stroke(lineWidth: 1))
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("UserName")
+                Text(vm.chatUser?.email ?? "")
                     .font(.system(size: 24, weight: .bold))
                 HStack {
                     Circle()
