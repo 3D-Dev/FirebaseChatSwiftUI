@@ -9,9 +9,6 @@ import SwiftUI
 import FirebaseFirestoreSwift
 import SDWebImageSwiftUI
 
-struct ChatUser {
-    let uid, email, profileImageUrl: String
-}
 class MainMessagesViewModel: ObservableObject {
     
     @Published var errorMessage = ""
@@ -20,6 +17,7 @@ class MainMessagesViewModel: ObservableObject {
     //@Published var userData : ChatUser?
     @Published var chatUser : ChatUser?
     @Published var isUserCurrentlyLoggedOut = false
+
     init() {
         DispatchQueue.main.async {
             self.isUserCurrentlyLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
@@ -46,10 +44,8 @@ class MainMessagesViewModel: ObservableObject {
                         return
 
                     }
-            let uid = data["uid"] as? String ?? ""
-            let email = data["email"] as? String ?? ""
-            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-            self.chatUser = ChatUser(uid: uid, email: email.replacingOccurrences(of: "@gmail.com", with: ""), profileImageUrl: profileImageUrl)
+            self.chatUser = .init(data: data)
+            
         }
         
 // Second method for access to firestore
@@ -134,7 +130,7 @@ struct MainMessageView: View {
                   buttons: [.destructive(Text("Sign Out"),
                                          action: {print("handle sign out");vm.handleSignOut()}),.cancel()])
         }
-        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut) {
+        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut, onDismiss: nil) {
             LoginView(didCompleteLoginProcess: {
                 self.vm.isUserCurrentlyLoggedOut = false
                 self.vm.fetchCurrentUser()
