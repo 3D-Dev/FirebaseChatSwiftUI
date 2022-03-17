@@ -9,9 +9,6 @@ import SwiftUI
 import FirebaseFirestoreSwift
 import SDWebImageSwiftUI
 
-struct ChatUser {
-    let uid, email, profileImageUrl: String
-}
 class MainMessagesViewModel: ObservableObject {
     
     @Published var errorMessage = ""
@@ -20,6 +17,7 @@ class MainMessagesViewModel: ObservableObject {
     //@Published var userData : ChatUser?
     @Published var chatUser : ChatUser?
     @Published var isUserCurrentlyLoggedOut = false
+
     init() {
         DispatchQueue.main.async {
             self.isUserCurrentlyLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
@@ -46,10 +44,8 @@ class MainMessagesViewModel: ObservableObject {
                         return
 
                     }
-            let uid = data["uid"] as? String ?? ""
-            let email = data["email"] as? String ?? ""
-            let profileImageUrl = data["profileImageUrl"] as? String ?? ""
-            self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+            self.chatUser = .init(data: data)
+            
         }
         
 // Second method for access to firestore
@@ -109,7 +105,7 @@ struct MainMessageView: View {
                             .stroke(lineWidth: 1))
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("UserName")
+                Text(vm.chatUser?.email ?? "")
                     .font(.system(size: 24, weight: .bold))
                 HStack {
                     Circle()
@@ -134,7 +130,7 @@ struct MainMessageView: View {
                   buttons: [.destructive(Text("Sign Out"),
                                          action: {print("handle sign out");vm.handleSignOut()}),.cancel()])
         }
-        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut) {
+        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut, onDismiss: nil) {
             LoginView(didCompleteLoginProcess: {
                 self.vm.isUserCurrentlyLoggedOut = false
                 self.vm.fetchCurrentUser()
@@ -169,6 +165,7 @@ struct MainMessageView: View {
         }.padding(.bottom, 50)
     }
     
+    @State var shouldShowNewMessageScreen = true
     private var newMessageButton : some View {
             Button {
                 
@@ -186,6 +183,9 @@ struct MainMessageView: View {
                 .padding(.horizontal, 15)
                 .shadow(radius: 15)
             }
+            .fullScreenCover(isPresented: $shouldShowNewMessageScreen, onDismiss: nil) {
+                CreateNewMessageView()
+            }
         }
 }
 
@@ -193,6 +193,7 @@ struct MainMessageView_Previews: PreviewProvider {
     static var previews: some View {
             MainMessageView()
             .preferredColorScheme(.dark)
+            MainMessageView()
 
     }
 }

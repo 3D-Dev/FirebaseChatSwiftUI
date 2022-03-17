@@ -9,12 +9,13 @@ import SwiftUI
 import Firebase
 
 struct LoginView: View {
+    let didCompleteLoginProcess: () -> ()
     @State private var isLoginMode = false
-    @State private var email = ""
-    @State private var password = ""
+    @State private var email = "test5@gmail.com"
+    @State private var password = "111111"
     @State private var shouldShowImagePicker = false
     @State private var image: UIImage?
-    @State var didCompleteLoginProcess: () -> ()
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -137,7 +138,7 @@ struct LoginView: View {
             }
             print("Successfully login user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully login user: \(result?.user.uid ?? "")"
-            MainMessageView()
+            self.didCompleteLoginProcess()
         }
     }
     
@@ -178,6 +179,7 @@ struct LoginView: View {
                 }
                 print("Success")
                 self.loginStatusMessage = "Successfully upload userInfo"
+                self.didCompleteLoginProcess()
             }
         
     }
@@ -189,5 +191,10 @@ struct ContentView_Previews: PreviewProvider {
         LoginView(didCompleteLoginProcess: {
             
         })
+            .preferredColorScheme(.dark)
+        LoginView(didCompleteLoginProcess: {
+            
+        })
+
     }
 }
