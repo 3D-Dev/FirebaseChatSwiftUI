@@ -77,15 +77,21 @@ class MainMessagesViewModel: ObservableObject {
     }
 }
 struct MainMessageView: View {
+    
+    @State var shouldNaviateToChatLogView = false
     @State var shouldShowLogOutOptions = false
     @ObservedObject private var vm = MainMessagesViewModel()
+    
     var body: some View {
         NavigationView {
             VStack {
                 Text(vm.errorMessage)
                     .foregroundColor(.red)
-                    customNavBar
-                    messageView
+                customNavBar
+                messageView
+                NavigationLink("LogView", isActive: $shouldNaviateToChatLogView) {
+                    ChatLogView(chatUser: self.chatUser)
+                }
             }
             .overlay(
                 newMessageButton, alignment: .bottom)
@@ -144,31 +150,36 @@ struct MainMessageView: View {
             ForEach(0..<10, id: \.self) {
                 num in
                     VStack {
-                        HStack(spacing: 16) {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 32))
-                                .padding()
-                                .overlay(RoundedRectangle(cornerRadius: 44)
-                                            .stroke(lineWidth: 1))
-                            VStack(alignment: .leading) {
-                                Text("UserName")
-                                Text("Message sent to user")
+                        NavigationLink{
+                            Text("Destination")
+                        } label: {
+                            HStack(spacing: 16) {
+                                Image(systemName: "person.fill")
+                                    .font(.system(size: 32))
+                                    .padding()
+                                    .overlay(RoundedRectangle(cornerRadius: 44)
+                                                .stroke(lineWidth: 1))
+                                VStack(alignment: .leading) {
+                                    Text("UserName")
+                                    Text("Message sent to user")
+                                }
+                                Spacer()
+                                Text("22h")
+                                    .font(.system(size: 14, weight: .semibold))
                             }
-                            Spacer()
-                            Text("22h")
-                                .font(.system(size: 14, weight: .semibold))
+                            Divider()
+                                .padding(.vertical, 8)
                         }
-                        Divider()
-                            .padding(.vertical, 8)
                     }
                 }.padding(.horizontal)
         }.padding(.bottom, 50)
     }
     
     @State var shouldShowNewMessageScreen = true
+    @State var chatUser: ChatUser?
     private var newMessageButton : some View {
             Button {
-                
+                shouldShowNewMessageScreen.toggle()
             } label: {
                 HStack {
                     Spacer()
@@ -184,15 +195,33 @@ struct MainMessageView: View {
                 .shadow(radius: 15)
             }
             .fullScreenCover(isPresented: $shouldShowNewMessageScreen, onDismiss: nil) {
-                CreateNewMessageView()
+                CreateNewMessageView(didSelectNewUser: {
+                    user in
+                    print(user.email)
+                    self.shouldNaviateToChatLogView.toggle()
+                    self.chatUser = user
+                })
+            }
+    }
+}
+
+struct ChatLogView : View {
+    let chatUser:ChatUser?
+    var body: some View {
+        ScrollView {
+            ForEach(0..<10) { num in
+                Text("Fake Message")
             }
         }
+        .navigationTitle(chatUser?.email ?? "")
+        .navigationBarTitleDisplayMode(.inline)
+    }
 }
 
 struct MainMessageView_Previews: PreviewProvider {
     static var previews: some View {
-            MainMessageView()
-            .preferredColorScheme(.dark)
+            //MainMessageView()
+            //.preferredColorScheme(.dark)
             MainMessageView()
 
     }
