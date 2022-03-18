@@ -90,7 +90,7 @@ struct MainMessageView: View {
                 customNavBar
                 messageView
                 NavigationLink("LogView", isActive: $shouldNaviateToChatLogView) {
-                    ChatLogView()
+                    ChatLogView(chatUser: self.chatUser)
                 }
             }
             .overlay(
@@ -206,12 +206,15 @@ struct MainMessageView: View {
 }
 
 struct ChatLogView : View {
+    let chatUser:ChatUser?
     var body: some View {
         ScrollView {
             ForEach(0..<10) { num in
                 Text("Fake Message")
             }
         }
+        .navigationTitle(chatUser?.email ?? "")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
