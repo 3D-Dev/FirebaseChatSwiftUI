@@ -36,26 +36,32 @@ class CreateNewMessageViewModel: ObservableObject {
     }
 }
 struct CreateNewMessageView: View {
+    
+    @Environment(\.presentationMode) var presentationMode
     @ObservedObject var vm = CreateNewMessageViewModel()
     
     var body: some View {
         NavigationView {
             ScrollView {
                 ForEach(vm.users) { user in
-                    HStack(spacing: 16) {
-                        WebImage(url: URL(string: user.profileImageUrl))
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 50, height: 50)
-                            .clipped()
-                            .cornerRadius(50)
-                            .overlay(RoundedRectangle(cornerRadius: 50)
-                                        .stroke(Color(.label),
-                                               lineWidth: 1))
-                        Text(user.email)
-                        Spacer()
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        HStack(spacing: 16) {
+                            WebImage(url: URL(string: user.profileImageUrl))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 50, height: 50)
+                                .clipped()
+                                .cornerRadius(50)
+                                .overlay(RoundedRectangle(cornerRadius: 50)
+                                            .stroke(Color(.label),
+                                                   lineWidth: 1))
+                            Text(user.email)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                     Divider()
                         .padding(.vertical, 5)
                 }
@@ -63,7 +69,7 @@ struct CreateNewMessageView: View {
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarLeading) {
                         Button {
-                            
+                            presentationMode.wrappedValue.dismiss()
                         } label: {
                             Text("Back")
                         }
@@ -75,7 +81,7 @@ struct CreateNewMessageView: View {
 
 struct CreateNewMessageView_Preview: PreviewProvider {
     static var previews: some View {
-        CreateNewMessageView()
+        MainMessageView()
     }
 }
 
