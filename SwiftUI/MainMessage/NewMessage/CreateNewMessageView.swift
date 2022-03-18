@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SDWebImageSwiftUI
 
 class CreateNewMessageViewModel: ObservableObject {
     @Published var users = [ChatUser]()
@@ -25,7 +26,11 @@ class CreateNewMessageViewModel: ObservableObject {
             }
             documentsSnapshot?.documents.forEach({ snapshot in
                 let data = snapshot.data()
-                self.users.append(.init(data: data))
+                let user = ChatUser(data: data)
+                if user.uid !=
+                    FirebaseManager.shared.auth.currentUser?.uid{
+                        self.users.append(.init(data: data))
+                }
             })
         }
     }
@@ -36,8 +41,23 @@ struct CreateNewMessageView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                ForEach(vm.users) { num in
-                    Text("New User")
+                ForEach(vm.users) { user in
+                    HStack(spacing: 16) {
+                        WebImage(url: URL(string: user.profileImageUrl))
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 50, height: 50)
+                            .clipped()
+                            .cornerRadius(50)
+                            .overlay(RoundedRectangle(cornerRadius: 50)
+                                        .stroke(Color(.label),
+                                               lineWidth: 1))
+                        Text(user.email)
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    Divider()
+                        .padding(.vertical, 5)
                 }
             }.navigationTitle("New Message")
                 .toolbar {
