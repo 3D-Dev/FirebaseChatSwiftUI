@@ -13,48 +13,54 @@ struct ChatLogView : View {
     
     var body: some View {
         VStack {
-            ScrollView {
-                ForEach(0..<10) { num in
-                    HStack {
-                        Spacer()
-                        HStack {
-                            Text("Fake Message")
-                                .foregroundColor(.white)
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                }
-                HStack{Spacer() }
-            }
-            .background(Color(.init(white: 0.9, alpha: 1)))
-            
-            HStack() {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 28))
-                    .foregroundColor(Color(.darkGray))
-                TextField("Description", text: $chatText)
-                Button {
-                    
-                } label: {
-                    Text("Send")
-                        .foregroundColor(.white)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(.blue)
-                .cornerRadius(4)
-
-            }
-            .padding()
-            
-            
+            messageView
+            chatBottomBar
         }
         .navigationTitle(chatUser?.email ?? "ssss")
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private var messageView: some View {
+        ScrollView {
+            ForEach(0..<10) { num in
+                HStack {
+                    Spacer()
+                    HStack {
+                        Text("Fake Message")
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+            }
+            HStack{Spacer() }
+        }
+        .background(Color(.init(white: 0.9, alpha: 1)))
+    }
+    
+    private var chatBottomBar: some View {
+        HStack() {
+            Image(systemName: "photo.on.rectangle.angled")
+                .font(.system(size: 28))
+                .foregroundColor(Color(.darkGray))
+            //TextEditor(text: $chatText)
+            TextField("Description", text: $chatText)
+            Button {
+                
+            } label: {
+                Text("Send")
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(.blue)
+            .cornerRadius(4)
+
+        }
+        .padding()
     }
         
 }
