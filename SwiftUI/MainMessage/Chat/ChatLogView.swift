@@ -6,20 +6,45 @@
 //
 
 import SwiftUI
+import Firebase
 
 class ChatLogViewModel : ObservableObject {
     @Published var chatText = ""
-    init() {
-        
+    @Published var errorMessage = ""
+    let chatUser: ChatUser?
+    init(chatUser: ChatUser?) {
+        self.chatUser = chatUser
     }
     
     func handleSend() {
         print(chatText)
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = chatUser?.uid else {return}
+        let document = FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .document()
+        
+        let messageData = ["fromId":fromId, "toId":toId, "text":chatText, "timestamp":Timestamp()] as [String:Any]
+        document.setData(messageData) {error in
+            if let error = error {
+                self.errorMessage = "Fail to save message into Firestore:\(error)"
+                return
+            }
+            print("Successfully saved current user sending in tht morning")
+            self.chatText = ""
+        }
     }
 }
 struct ChatLogView : View {
     let chatUser:ChatUser?
-    @ObservedObject var vm = ChatLogViewModel()
+    @ObservedObject var vm: ChatLogViewModel
+    
+    init(chatUser: ChatUser?) {
+        self.chatUser = chatUser
+        self.vm = .init(chatUser: chatUser)
+    }
     
     var body: some View {
         ZStack {
