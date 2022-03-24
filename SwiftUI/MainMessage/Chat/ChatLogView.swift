@@ -7,9 +7,19 @@
 
 import SwiftUI
 
+class ChatLogViewModel : ObservableObject {
+    init() {
+        
+    }
+    
+    func handleSend(text: String) {
+        print(text)
+    }
+}
 struct ChatLogView : View {
     let chatUser:ChatUser?
     @State var chatText = ""
+    @ObservedObject var vm = ChatLogViewModel()
     
     var body: some View {
         ZStack {
@@ -26,7 +36,7 @@ struct ChatLogView : View {
     
     private var messageView: some View {
         ScrollView {
-            ForEach(0..<10) { num in
+            ForEach(0..<20) { num in
                 HStack {
                     Spacer()
                     HStack {
@@ -53,7 +63,7 @@ struct ChatLogView : View {
             //TextEditor(text: $chatText)
             TextField("Description", text: $chatText)
             Button {
-                
+                vm.handleSend(text: self.chatText)
             } label: {
                 Text("Send")
                     .foregroundColor(.white)
