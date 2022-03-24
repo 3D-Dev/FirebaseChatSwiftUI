@@ -12,9 +12,13 @@ struct ChatLogView : View {
     @State var chatText = ""
     
     var body: some View {
-        VStack {
+        ZStack {
             messageView
-            chatBottomBar
+            VStack {
+                Spacer()
+                chatBottomBar
+                    .background(Color.white)
+            }
         }
         .navigationTitle(chatUser?.email ?? "ssss")
         .navigationBarTitleDisplayMode(.inline)
@@ -67,8 +71,10 @@ struct ChatLogView : View {
 
 struct ChatLogView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
+        Group {
+            NavigationView {
+                ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
+            }
         }
     }
 }
