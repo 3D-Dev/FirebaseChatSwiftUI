@@ -6,10 +6,45 @@
 //
 
 import SwiftUI
+import Firebase
 
+class ChatLogViewModel : ObservableObject {
+    @Published var chatText = ""
+    @Published var errorMessage = ""
+    let chatUser: ChatUser?
+    init(chatUser: ChatUser?) {
+        self.chatUser = chatUser
+    }
+    
+    func handleSend() {
+        print(chatText)
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = chatUser?.uid else {return}
+        let document = FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .document()
+        
+        let messageData = ["fromId":fromId, "toId":toId, "text":chatText, "timestamp":Timestamp()] as [String:Any]
+        document.setData(messageData) {error in
+            if let error = error {
+                self.errorMessage = "Fail to save message into Firestore:\(error)"
+                return
+            }
+            print("Successfully saved current user sending in tht morning")
+            self.chatText = ""
+        }
+    }
+}
 struct ChatLogView : View {
     let chatUser:ChatUser?
-    @State var chatText = ""
+    @ObservedObject var vm: ChatLogViewModel
+    
+    init(chatUser: ChatUser?) {
+        self.chatUser = chatUser
+        self.vm = .init(chatUser: chatUser)
+    }
     
     var body: some View {
         ZStack {
@@ -26,7 +61,7 @@ struct ChatLogView : View {
     
     private var messageView: some View {
         ScrollView {
-            ForEach(0..<10) { num in
+            ForEach(0..<20) { num in
                 HStack {
                     Spacer()
                     HStack {
@@ -50,10 +85,16 @@ struct ChatLogView : View {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 28))
                 .foregroundColor(Color(.darkGray))
+            
+            ZStack {
+                TextEditor(text: $vm.chatText)
+                    .opacity(vm.chatText.isEmpty ? 0.5 : 1)
+            }
+            .frame(height: 40)
             //TextEditor(text: $chatText)
-            TextField("Description", text: $chatText)
+            //TextField("Description", text: $vm.chatText)
             Button {
-                
+                vm.handleSend()
             } label: {
                 Text("Send")
                     .foregroundColor(.white)
