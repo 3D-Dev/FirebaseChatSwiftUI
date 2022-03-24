@@ -75,16 +75,6 @@ struct ChatLogView_Previews: PreviewProvider {
             NavigationView {
                 ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
             }
-            NavigationView {
-                ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
-            }
-            NavigationView {
-                ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
-            }
-            NavigationView {
-                ChatLogView(chatUser: .init(data: ["uid": "", "email": "test@gmail.com"]))
-            }
-.previewInterfaceOrientation(.landscapeLeft)
         }
     }
 }
