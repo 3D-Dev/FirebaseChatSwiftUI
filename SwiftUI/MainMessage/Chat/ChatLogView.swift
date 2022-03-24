@@ -8,17 +8,17 @@
 import SwiftUI
 
 class ChatLogViewModel : ObservableObject {
+    @Published var chatText = ""
     init() {
         
     }
     
-    func handleSend(text: String) {
-        print(text)
+    func handleSend() {
+        print(chatText)
     }
 }
 struct ChatLogView : View {
     let chatUser:ChatUser?
-    @State var chatText = ""
     @ObservedObject var vm = ChatLogViewModel()
     
     var body: some View {
@@ -60,10 +60,16 @@ struct ChatLogView : View {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 28))
                 .foregroundColor(Color(.darkGray))
+            
+            ZStack {
+                TextEditor(text: $vm.chatText)
+                    .opacity(vm.chatText.isEmpty ? 0.5 : 1)
+            }
+            .frame(height: 40)
             //TextEditor(text: $chatText)
-            TextField("Description", text: $chatText)
+            //TextField("Description", text: $vm.chatText)
             Button {
-                vm.handleSend(text: self.chatText)
+                vm.handleSend()
             } label: {
                 Text("Send")
                     .foregroundColor(.white)
