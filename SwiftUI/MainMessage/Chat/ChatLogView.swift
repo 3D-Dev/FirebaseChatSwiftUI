@@ -8,12 +8,58 @@
 import SwiftUI
 import Firebase
 
+struct FirebaseConstants {
+    static let fromId = "fromId"
+    static let toId = "toId"
+    static let text = "text"
+}
+
+struct ChatMessage: Identifiable {
+
+    var id: String { documentId }
+
+    let documentId: String
+    let fromId, toId, text: String
+
+    init(documentId: String, data: [String: Any]) {
+        self.documentId = documentId
+        self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
+        self.toId = data[FirebaseConstants.toId] as? String ?? ""
+        self.text = data[FirebaseConstants.text] as? String ?? ""
+    }
+}
+
 class ChatLogViewModel : ObservableObject {
     @Published var chatText = ""
     @Published var errorMessage = ""
+    @Published var chatMessages = [ChatMessage]()
+
     let chatUser: ChatUser?
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
+        fetchMessages()
+    }
+    
+    private func fetchMessages() {
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = chatUser?.uid else {return}
+        FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .addSnapshotListener{querySnapshot, error in
+                 if let error = error {
+                    self.errorMessage = "Failed to lesten for messages:\(error)"
+                    print(error)
+                    return
+                }
+                querySnapshot?.documentChanges.forEach({change in
+                    if change.type == .added {
+                        let data = change.document.data()
+                        self.chatMessages.append(.init(documentId: change.document.documentID, data: data))
+                    }
+                })
+            }
     }
     
     func handleSend() {
@@ -47,41 +93,55 @@ struct ChatLogView : View {
     }
     
     var body: some View {
-        messageView
-//        ZStack {
-//
-//            VStack {
-//                Spacer()
-//                chatBottomBar
-//                    .background(Color.white)
-//            }
-//        }
+        ZStack {
+            messageView
+            VStack {
+                Spacer()
+                chatBottomBar
+                    .background(Color.white)
+            }
+        }
         .navigationTitle(chatUser?.email ?? "ssss")
         .navigationBarTitleDisplayMode(.inline)
     }
     
     private var messageView: some View {
         ScrollView {
-            ForEach(0..<20) { num in
-                HStack {
-                    Spacer()
-                    HStack {
-                        Text("Fake Message")
-                            .foregroundColor(.white)
+            ForEach(vm.chatMessages) { message in
+                VStack {
+                    if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                        HStack {
+                            Spacer()
+                            HStack {
+                                Text(message.text)
+                                    .foregroundColor(.white)
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 8)
                     }
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
+                    else {
+                        HStack {
+                            Spacer()
+                            HStack {
+                                Text(message.text)
+                                    .foregroundColor(.white)
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                    }
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
             }
             HStack{Spacer() }
         }
         .background(Color(.init(white: 0.9, alpha: 1)))
-        .safeAreaInset(edge: .bottom) {
-            chatBottomBar
-        }
     }
     
     private var chatBottomBar: some View {
